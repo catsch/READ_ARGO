@@ -1,40 +1,51 @@
 ############################################################################################
-# Routine developpee par C. Schmechtig Antoine Poteau et Henry Bittig
+# Routine developpee par C. Schmechtig 
 #
-# March 2016 : Read Coriolis Data 
+# June 2018 : Use this routine to get data from B and C Files  
 #############################################################################################
 
-library(ncdf)
+library(ncdf4)
+require(oce)
+library(stringr) ### manipulate char string 
 
-file_in_BRtraj="../DATA/6901032_BRtraj.nc"
-file_in_Rtraj="../DATA/6901032_Rtraj.nc"
-
-
-nc_file=open.ncdf(file_in_BRtraj,readunlim=FALSE)
-nc_file2=open.ncdf(file_in_Rtraj,readunlim=FALSE)
-
-CHLA=get.var.ncdf(nc_file,"CHLA")
-PRES=get.var.ncdf(nc_file,"PRES")
-plot(PRES,ylim=c(0,1500))
-
-DATA_TYPE=get.var.ncdf(nc_file,"DATA_TYPE") # Btrajectory pas important
+source("./read_CTD.R")
+source("./read_BFILE.R")
 
 
-# liste des mesures 
-TRAJECTORY_PARAMETERS=get.var.ncdf(nc_file,"TRAJECTORY_PARAMETERS")
+#############################################################################################
+# 1. OPEN the files
+#############################################################################################
+###### to change to read all files on order to perform DM in it 
+# File B
+file_in_B="/home/schmechtig/TRAITEMENT_FLOTTEUR/ANTOINE/DATA_MANAGEMENT/RT/DATA/6901032/BR6901032_002.nc"
 
-# JULD 
-JULD=get.var.ncdf(nc_file,"JULD")
-plot(JULD,ylim=c(23000,23100))
+# File C (could be D or R)
+file_in_C="/home/schmechtig/TRAITEMENT_FLOTTEUR/ANTOINE/DATA_MANAGEMENT/RT/DATA/6901032/D6901032_002.nc"
 
-# latitude
-LATITUDE=get.var.ncdf(nc_file2,"LATITUDE")
-POSITION_QC=get.var.ncdf(nc_file2,"POSITION_QC")
+# Open the file 
+filenc_B=nc_open(file_in_B,readunlim=FALSE,write=FALSE)
 
-PRES_core=get.var.ncdf(nc_file2,"PRES")
+##################################################
+#### 1. Get CTD Data from the Netcdf C File 
+##################################################
 
-#Measurement_code for BR_TRAJ
-MEASUREMENT_CODE=get.var.ncdf(nc_file,"MEASUREMENT_CODE")
+CTD=read_CTD(file_in_C)
 
-#Measurement_code for R_TRAJ
-MEASUREMENT_CODE_core=get.var.ncdf(nc_file2,"MEASUREMENT_CODE")
+# we get	: CTD$PRES 
+#  			: CTD$PSAL 
+#			: CTD$TEMP
+#			: CTD$PRES_QC
+#			: CTD$PSAL_QC
+#			: CTD$TEMP_QC
+
+
+##################################################
+#### 2. Get BGC data from the B File
+##################################################
+
+B_FILE=read_BFILE(filenc_B)
+
+
+
+
+
